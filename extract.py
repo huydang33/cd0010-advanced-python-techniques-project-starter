@@ -25,8 +25,23 @@ def load_neos(neo_csv_path):
     :return: A collection of `NearEarthObject`s.
     """
     # TODO: Load NEO data from the given CSV file.
-    return ()
-
+    with open(neo_csv_path, "r") as f:
+        data_list = csv.DictReader(f)
+        list_neos = []
+        for data in data_list:
+            neo_info = {
+                "designation": data["pdes"],
+                "name": data["name"] or None,
+                "diameter": float(data["diameter"]) if data["diameter"] else float("nan"),
+                "hazardous": False if data["pha"] in ["", "N"] else True
+            }
+            try:
+                neo = NearEarthObject(**neo_info)
+            except Exception as e:
+                print(e)
+            else:
+                list_neos.append(neo)
+    return list_neos
 
 def load_approaches(cad_json_path):
     """Read close approach data from a JSON file.
@@ -35,4 +50,25 @@ def load_approaches(cad_json_path):
     :return: A collection of `CloseApproach`es.
     """
     # TODO: Load close approach data from the given JSON file.
-    return ()
+    with open(cad_json_path, "r") as file:
+        json_data = json.load(file)
+        list_cad = []
+        columns = zip(*json_data['data'])
+        result = {field: list(column) for field, column in zip(json_data['fields'], columns)}
+        for index in range(len(result['des'])):
+            cad_info = {
+                "designation": result['des'][index],
+                "time": result['cd'][index],
+                "distance": float(result['dist'][index]),
+                "velocity": float(result['v_rel'][index]) 
+            }
+            try:
+                cad = CloseApproach(**cad_info)
+            except Exception as e:
+                print(e)
+            else:
+                list_cad.append(cad)
+    
+    return list_cad
+
+
