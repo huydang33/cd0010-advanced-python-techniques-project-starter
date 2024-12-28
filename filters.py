@@ -71,6 +71,75 @@ class AttributeFilter:
     def __repr__(self):
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
+class DateAttr(AttributeFilter):
+    """Subclass of AttributeFilter to filter CloseApproach objects by date."""
+    @classmethod
+    def get(cls, approach):
+        """Get approach.time converted to datetime.datetime object for the date filter.
+        
+        Args:
+            approach (CloseApproach): A CloseApproach object.
+        Returns:
+            [datetime.datetime]: Converted time to datetime object.
+            
+        """
+        return approach.time.date()
+
+class DistanceAttr(AttributeFilter):
+    """Subclass of AttributeFilter to filter CloseApproach objects by distance."""
+    @classmethod
+    def get(cls, approach):
+        """Get approach.distance for the distance filter.
+        
+        Args:
+            approach (CloseApproach): A CloseApproach object.
+        Returns:
+            [Float]: Converted time to distance object.
+            
+        """
+        return approach.distance
+    
+class VelocityAttr(AttributeFilter):
+    """Subclass of AttributeFilter to filter CloseApproach objects by velocity."""
+    @classmethod
+    def get(cls, approach):
+        """Get approach.velocity for the velocity filter.
+        
+        Args:
+            approach (CloseApproach): A CloseApproach object.
+        Returns:
+            [Float]: Converted time to velocity object.
+            
+        """
+        return approach.velocity
+    
+class DiameterAttr(AttributeFilter):
+    """Subclass of AttributeFilter to filter CloseApproach objects by diameter."""
+    @classmethod
+    def get(cls, approach):
+        """Get approach.neo.diameter for the diameter filter.
+        
+        Args:
+            approach (CloseApproach): A CloseApproach object.
+        Returns:
+            [Float]: Converted time to diameter object.
+            
+        """
+        return approach.neo.diameter
+    
+class HazardousAttr(AttributeFilter):
+    """Subclass of AttributeFilter to filter CloseApproach objects by hazardous."""
+    @classmethod
+    def get(cls, approach):
+        """Get approach.neo.hazardous for the hazardous filter.
+        
+        Args:
+            approach (CloseApproach): A CloseApproach object.
+        Returns:
+            [Boolean]: Converted time to hazardous object.
+            
+        """
+        return approach.neo.hazardous
 
 def create_filters(
         date=None, start_date=None, end_date=None,
@@ -109,7 +178,29 @@ def create_filters(
     :return: A collection of filters for use with `query`.
     """
     # TODO: Decide how you will represent your filters.
-    return ()
+    filters = []
+
+    if date:
+        filters.append(DateAttr(operator.eq, date))
+    if start_date:
+        filters.append(DateAttr(operator.ge, start_date))
+    if end_date:
+        filters.append(DateAttr(operator.le, end_date))
+    if distance_min:
+        filters.append(DistanceAttr(operator.ge, distance_min))
+    if distance_max:
+        filters.append(DistanceAttr(operator.le, distance_max))
+    if velocity_min:
+        filters.append(VelocityAttr(operator.ge, velocity_min))  
+    if velocity_max:
+        filters.append(VelocityAttr(operator.le, velocity_max))    
+    if diameter_min:
+        filters.append(DiameterAttr(operator.ge, diameter_min))  
+    if diameter_max:
+        filters.append(DiameterAttr(operator.le, diameter_max))  
+    if hazardous is not None:
+        filters.append(HazardousAttr(operator.eq, hazardous))  
+    return filters
 
 
 def limit(iterator, n=None):
@@ -122,4 +213,6 @@ def limit(iterator, n=None):
     :yield: The first (at most) `n` values from the iterator.
     """
     # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    if n == 0 or n is None:
+        return iterator
+    return [x for i, x in enumerate(iterator) if i<n]
