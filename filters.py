@@ -17,7 +17,7 @@ iterator.
 You'll edit this file in Tasks 3a and 3c.
 """
 import operator
-
+from itertools import islice
 
 class UnsupportedCriterionError(NotImplementedError):
     """A filter criterion is unsupported."""
@@ -215,4 +215,4 @@ def limit(iterator, n=None):
     # Produce at most `n` values from the given iterator.
     if n == 0 or n is None:
         return iterator
-    return [x for i, x in enumerate(iterator) if i<n]
+    return islice(iterator, 0, n)
