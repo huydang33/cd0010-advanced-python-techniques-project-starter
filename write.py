@@ -54,7 +54,7 @@ def write_to_json(results, filename):
     for result in results:
         content = {**result.serialize(), **result.neo.serialize()}
         content["name"] = content["name"] if content["name"] is not None else ""
-        content["potentially_hazardous"] = bool(1) if content["potentially_hazardous"] else bool(0)
+        content["potentially_hazardous"] = True if content["potentially_hazardous"] else False
         data.append(
             {
                 "datetime_utc": content["datetime_utc"],
