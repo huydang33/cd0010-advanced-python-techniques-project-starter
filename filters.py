@@ -215,4 +215,4 @@ def limit(iterator, n=None):
     # Produce at most `n` values from the given iterator.
     if n == 0 or n is None:
         return iterator
-    return islice(iterator, 0, n)
+    return islice(iterator, n)
